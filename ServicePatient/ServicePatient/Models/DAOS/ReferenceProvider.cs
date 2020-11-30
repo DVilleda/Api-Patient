@@ -19,7 +19,7 @@ namespace ServicePatient.Models.DAOS
             cnx.ConnectionString = cnxString;
             cnx.Open();
             DbCommand cmd = cnx.CreateCommand();
-            cmd.CommandText = "Select * from references";
+            cmd.CommandText = "Select * from reference";
             DbDataReader dr = cmd.ExecuteReader();
             while (dr.Read()) 
             {
@@ -46,7 +46,7 @@ namespace ServicePatient.Models.DAOS
             cnx.ConnectionString = cnxString;
             cnx.Open();
             DbCommand cmd = cnx.CreateCommand();
-            cmd.CommandText = "Select * from references Where id_patient=@id";
+            cmd.CommandText = "SELECT * FROM reference WHERE id_patient=@id";
             DbParameter param = new MySqlParameter
             {
                 ParameterName = "id",
@@ -80,7 +80,7 @@ namespace ServicePatient.Models.DAOS
             cnx.ConnectionString = cnxString;
             cnx.Open();
             DbCommand cmd = cnx.CreateCommand();
-            cmd.CommandText = "Select * from references Where id_docteur=@id";
+            cmd.CommandText = "Select * from reference Where id_docteur=@id";
             DbParameter param = new MySqlParameter
             {
                 ParameterName = "id",
@@ -112,7 +112,7 @@ namespace ServicePatient.Models.DAOS
             cnx.ConnectionString = cnxString;
             cnx.Open();
             DbCommand cmd = cnx.CreateCommand();
-            cmd.CommandText = "Insert INTO references(id_patient,id_docteur,Nom_Docteur,Lieu_Reference,Raison,Date_Reference)" +
+            cmd.CommandText = "Insert INTO reference(id_patient,id_docteur,Nom_Docteur,Lieu_Reference,Raison,Date_Reference)" +
                 "Values(@id_patient,@id_doc,@nom_doc,@lieu,@raison,@date)";
             DbParameter param;
             param = new MySqlParameter
@@ -167,7 +167,7 @@ namespace ServicePatient.Models.DAOS
             cnx.ConnectionString = cnxString;
             cnx.Open();
             DbCommand cmd = cnx.CreateCommand();
-            cmd.CommandText = "UPDATE references Set Lieu_Reference=@lieu,Raison=@raison WHERE ID=@id ";
+            cmd.CommandText = "UPDATE reference Set Lieu_Reference=@lieu,Raison=@raison WHERE ID=@id ";
             DbParameter param;
             param = new MySqlParameter
             {
@@ -200,7 +200,7 @@ namespace ServicePatient.Models.DAOS
             cnx.ConnectionString = cnxString;
             cnx.Open();
             DbCommand cmd = cnx.CreateCommand();
-            cmd.CommandText = "Delete from references WHERE ID=@id";
+            cmd.CommandText = "Delete from reference WHERE ID=@id";
             DbParameter param = new MySqlParameter
             {
                 ParameterName = "id",

@@ -12,6 +12,8 @@ namespace ServicePatient.Models
         [DataMember]
         public int id { get; set; }
         [DataMember]
+        public string numAssMaladie { get; set; }
+        [DataMember]
         public string nom { get; set; }
         [DataMember]
         public string prenom { get; set; }

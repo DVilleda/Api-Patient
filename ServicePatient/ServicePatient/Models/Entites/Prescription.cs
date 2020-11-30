@@ -25,6 +25,5 @@ namespace ServicePatient.Models
         public int id_patient { get; set; }
         [DataMember]
         public int id_docteur { get; set; }
-
     }
 }

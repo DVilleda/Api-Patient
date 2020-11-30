@@ -1,4 +1,6 @@
-﻿using System;
+﻿using ServicePatient.Models;
+using ServicePatient.Models.DAOS;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -10,25 +12,56 @@ namespace ServicePatient.Controllers
     public class PatientController : ApiController
     {
         // GET api/<controller>
-        public IEnumerable<string> Get()
+        public IEnumerable<Patient> Get()
         {
-            return new string[] { "value1", "value2" };
+            return PatientProvider.GetAll();
+        }
+
+        [Route("api/Patient/{patientID}/prescriptions")]
+        [HttpGet]
+        public IEnumerable<Prescription> GetPrescriptions(int patientID)
+        {
+            return PrescriptionProvider.GetAllPrescriptionsByPatient(patientID);
+        }
+
+        [Route("api/Patient/{patientID}/references")]
+        [HttpGet]
+        public IEnumerable<References> GetReferences(int patientID)
+        {
+            return ReferenceProvider.GetAllReferencesByPatient(patientID);
+        }
+
+        [Route("api/Patient/{patientID}/Notes")]
+        [HttpGet]
+        public IEnumerable<Notes> GetNotes(int patientID)
+        {
+            return NotesProvider.GetNotesByPatient(patientID);
         }
 
         // GET api/<controller>/5
-        public string Get(int id)
+        public IHttpActionResult Get(int id)
         {
-            return "value";
+            Patient patient = PatientProvider.GetPatient(id);
+            if (patient != null)
+            {
+                return this.Ok(patient);
+            }
+            else
+            {
+                return this.NotFound();
+            }
         }
 
         // POST api/<controller>
-        public void Post([FromBody] string value)
+        public string Post(Patient patient)
         {
+            return PatientProvider.AddPatient(patient);
         }
 
         // PUT api/<controller>/5
-        public void Put(int id, [FromBody] string value)
+        public bool Put(Patient patient)
         {
+            return PatientProvider.ModifierPatient(patient);
         }
 
         // DELETE api/<controller>/5

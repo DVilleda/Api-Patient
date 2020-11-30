@@ -67,8 +67,39 @@ namespace ServicePatient.Models.DAOS
             cnx.Close();
             return null;
         }
+        private static string RetournerAPIKey(Docteur docteur)
+        {
+            DbConnection cnx = new MySqlConnection();
+            cnx.ConnectionString = cnxString;
+            cnx.Open();
+            DbCommand cmd = cnx.CreateCommand();
+            cmd.CommandText = "SELECT * FROM docteur WHERE Num_Employe=@num";
+            DbParameter param = new MySqlParameter
+            {
+                ParameterName = "num",
+                DbType = System.Data.DbType.Int32,
+                Value = docteur.num_employe
+            };
+            cmd.Parameters.Add(param);
+            DbDataReader dr = cmd.ExecuteReader();
+            if (dr.Read())
+            {
+                Docteur docteurKEY = new Docteur
+                {
+                    id = Int32.Parse(dr["ID"].ToString()),
+                    nom = dr["Nom"].ToString(),
+                    prenom = dr["Prenom"].ToString(),
+                    num_employe = Int32.Parse(dr["Num_Employe"].ToString()),
+                    specialite = dr["Specialisation"].ToString()
+                };
+                string idDoc = docteurKEY.id.ToString()+".Docteur";
+                return EncodeToBase64(idDoc);
+            }
+            cnx.Close();
+            return null;
+        }
 
-        public static int AddDocteur(Docteur docteur) 
+        public static string AddDocteur(Docteur docteur) 
         {
             DbConnection cnx = new MySqlConnection();
             cnx.ConnectionString = cnxString;
@@ -105,8 +136,45 @@ namespace ServicePatient.Models.DAOS
                 Value = docteur.specialite
             };
             cmd.Parameters.Add(param);
-            int resultID = (int)cmd.ExecuteScalar();
-            return resultID;
+            bool result = cmd.ExecuteNonQuery() > 0;
+            cnx.Close();
+            if (result) 
+            {
+                return RetournerAPIKey(docteur);
+            }
+            else { return null; }
+        }
+
+        public static bool ModifierDocteur(Docteur docteur)
+        {
+            DbConnection cnx = new MySqlConnection();
+            cnx.ConnectionString = cnxString;
+            cnx.Open();
+            DbCommand cmd = cnx.CreateCommand();
+            cmd.CommandText = "UPDATE docteur Set Specialisation=@spec Where ID=@id";
+            DbParameter param;
+            param = new MySqlParameter
+            {
+                ParameterName = "id",
+                DbType = System.Data.DbType.Int32,
+                Value = docteur.id
+            };
+            cmd.Parameters.Add(param);
+            param = new MySqlParameter
+            {
+                ParameterName = "spec",
+                DbType = System.Data.DbType.String,
+                Value = docteur.specialite
+            };
+            cmd.Parameters.Add(param);
+            bool result = cmd.ExecuteNonQuery() > 0;
+            cnx.Close();
+            return result;
+        }
+        private static string EncodeToBase64(string id) 
+        {
+            var TextBytes = System.Text.Encoding.UTF8.GetBytes(id);
+            return System.Convert.ToBase64String(TextBytes);
         }
     }
 }
