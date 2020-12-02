@@ -60,7 +60,8 @@ namespace ServicePatient.Models.DAOS
                     nom = dr["Nom"].ToString(),
                     prenom = dr["Prenom"].ToString(),
                     num_employe = Int32.Parse(dr["Num_Employe"].ToString()),
-                    specialite = dr["Specialisation"].ToString()
+                    specialite = dr["Specialisation"].ToString(),
+                    apikey = dr["APIKey"].ToString()
                 };
                 return docteur;
             }
@@ -93,6 +94,7 @@ namespace ServicePatient.Models.DAOS
                     specialite = dr["Specialisation"].ToString()
                 };
                 string idDoc = docteurKEY.id.ToString()+".Docteur";
+                AddKeyDatabase(docteurKEY, EncodeToBase64(idDoc));
                 return EncodeToBase64(idDoc);
             }
             cnx.Close();
@@ -165,6 +167,33 @@ namespace ServicePatient.Models.DAOS
                 ParameterName = "spec",
                 DbType = System.Data.DbType.String,
                 Value = docteur.specialite
+            };
+            cmd.Parameters.Add(param);
+            bool result = cmd.ExecuteNonQuery() > 0;
+            cnx.Close();
+            return result;
+        }
+
+        private static bool AddKeyDatabase(Docteur docteur,string apikey) 
+        {
+            DbConnection cnx = new MySqlConnection();
+            cnx.ConnectionString = cnxString;
+            cnx.Open();
+            DbCommand cmd = cnx.CreateCommand();
+            cmd.CommandText = "UPDATE docteur Set APIKey=@apikey Where ID=@id";
+            DbParameter param;
+            param = new MySqlParameter
+            {
+                ParameterName = "id",
+                DbType = System.Data.DbType.Int32,
+                Value = docteur.id
+            };
+            cmd.Parameters.Add(param);
+            param = new MySqlParameter
+            {
+                ParameterName = "apikey",
+                DbType = System.Data.DbType.String,
+                Value = apikey
             };
             cmd.Parameters.Add(param);
             bool result = cmd.ExecuteNonQuery() > 0;

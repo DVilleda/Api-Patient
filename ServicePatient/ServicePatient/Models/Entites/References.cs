@@ -12,7 +12,7 @@ namespace ServicePatient.Models
         [DataMember]
         public int id { get; set; }
         [DataMember]
-        public string Nom_Doc { get; set; }
+        public string Nom_Specialisation { get; set; }
         [DataMember]
         public string adresse_ref { get; set; }
         [DataMember]

@@ -28,7 +28,7 @@ namespace ServicePatient.Models.DAOS
                     id = Int32.Parse(dr["ID"].ToString()),
                     id_patient = Int32.Parse(dr["id_patient"].ToString()),
                     id_docteur = Int32.Parse(dr["id_docteur"].ToString()),
-                    Nom_Doc = dr["Nom_Docteur"].ToString(),
+                    Nom_Specialisation = dr["Nom_Specialisation"].ToString(),
                     adresse_ref = dr["Lieu_Reference"].ToString(),
                     raison_ref = dr["Raison"].ToString(),
                     date_creation = DateTime.Parse(dr["Date_Reference"].ToString())
@@ -38,6 +38,40 @@ namespace ServicePatient.Models.DAOS
             cnx.Close();
             return liste;
         }
+        public static References GetReference(int id)
+        {
+            References reference;
+            DbConnection cnx = new MySqlConnection();
+            cnx.ConnectionString = cnxString;
+            cnx.Open();
+            DbCommand cmd = cnx.CreateCommand();
+            cmd.CommandText = "SELECT * FROM reference WHERE ID=@id";
+            DbParameter param = new MySqlParameter
+            {
+                ParameterName = "id",
+                DbType = System.Data.DbType.Int32,
+                Value = id
+            };
+            cmd.Parameters.Add(param);
+            DbDataReader dr = cmd.ExecuteReader();
+            if (dr.Read())
+            {
+                reference = new References()
+                {
+                    id = Int32.Parse(dr["ID"].ToString()),
+                    id_patient = Int32.Parse(dr["id_patient"].ToString()),
+                    id_docteur = Int32.Parse(dr["id_docteur"].ToString()),
+                    Nom_Specialisation = dr["Nom_Specialisation"].ToString(),
+                    adresse_ref = dr["Lieu_Reference"].ToString(),
+                    raison_ref = dr["Raison"].ToString(),
+                    date_creation = DateTime.Parse(dr["Date_Reference"].ToString())
+                };
+                return reference;
+            }
+            cnx.Close();
+            return null;
+        }
+
         public static List<References> GetAllReferencesByPatient(int id)
         {
             List<References> liste = new List<References>();
@@ -62,7 +96,7 @@ namespace ServicePatient.Models.DAOS
                     id = Int32.Parse(dr["ID"].ToString()),
                     id_patient = Int32.Parse(dr["id_patient"].ToString()),
                     id_docteur = Int32.Parse(dr["id_docteur"].ToString()),
-                    Nom_Doc = dr["Nom_Docteur"].ToString(),
+                    Nom_Specialisation = dr["Nom_Specialisation"].ToString(),
                     adresse_ref = dr["Lieu_Reference"].ToString(),
                     raison_ref = dr["Raison"].ToString(),
                     date_creation = DateTime.Parse(dr["Date_Reference"].ToString())
@@ -96,7 +130,7 @@ namespace ServicePatient.Models.DAOS
                     id = Int32.Parse(dr["ID"].ToString()),
                     id_patient = Int32.Parse(dr["id_patient"].ToString()),
                     id_docteur = Int32.Parse(dr["id_docteur"].ToString()),
-                    Nom_Doc = dr["Nom_Docteur"].ToString(),
+                    Nom_Specialisation = dr["Nom_Specialisation"].ToString(),
                     adresse_ref = dr["Lieu_Reference"].ToString(),
                     raison_ref = dr["Raison"].ToString(),
                     date_creation = DateTime.Parse(dr["Date_Reference"].ToString())
@@ -112,8 +146,8 @@ namespace ServicePatient.Models.DAOS
             cnx.ConnectionString = cnxString;
             cnx.Open();
             DbCommand cmd = cnx.CreateCommand();
-            cmd.CommandText = "Insert INTO reference(id_patient,id_docteur,Nom_Docteur,Lieu_Reference,Raison,Date_Reference)" +
-                "Values(@id_patient,@id_doc,@nom_doc,@lieu,@raison,@date)";
+            cmd.CommandText = "Insert INTO reference(id_patient,id_docteur,Nom_Specialisation,Lieu_Reference,Raison,Date_Reference)" +
+                "Values(@id_patient,@id_doc,@nom_spec,@lieu,@raison,@date)";
             DbParameter param;
             param = new MySqlParameter
             {
@@ -131,9 +165,9 @@ namespace ServicePatient.Models.DAOS
             cmd.Parameters.Add(param);
             param = new MySqlParameter
             {
-                ParameterName = "nom_doc",
+                ParameterName = "nom_spec",
                 DbType = System.Data.DbType.String,
-                Value = reference.Nom_Doc
+                Value = reference.Nom_Specialisation
             };
             cmd.Parameters.Add(param);
             param = new MySqlParameter

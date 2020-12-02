@@ -29,12 +29,13 @@ namespace ServicePatient.Models.DAOS
                     numAssMaladie = dr["Num_AssMal"].ToString(),
                     nom = dr["Nom"].ToString(),
                     prenom = dr["Prenom"].ToString(),
-                    age = Int32.Parse(dr["Age"].ToString()),
+                    date_naissance = DateTime.Parse(dr["Date_Naissance"].ToString()),
                     sexe = dr["Sexe"].ToString(),
                     allergies = dr["Allergies"].ToString(),
                     adresse = dr["Adresse"].ToString(),
                     num_tel = Int32.Parse(dr["Num_Tel"].ToString()),
-                    assurance = Convert.ToBoolean(dr["Assurance"].ToString())
+                    assurance = Convert.ToBoolean(dr["Assurance"].ToString()),
+                    apikey = dr["APIKey"].ToString()
                 };
                 liste.Add(patient);
             }
@@ -66,12 +67,13 @@ namespace ServicePatient.Models.DAOS
                     numAssMaladie = dr["Num_AssMal"].ToString(),
                     nom = dr["Nom"].ToString(),
                     prenom = dr["Prenom"].ToString(),
-                    age = Int32.Parse(dr["Age"].ToString()),
+                    date_naissance = DateTime.Parse(dr["Date_Naissance"].ToString()),
                     sexe = dr["Sexe"].ToString(),
                     allergies = dr["Allergies"].ToString(),
                     adresse = dr["Adresse"].ToString(),
                     num_tel = Int32.Parse(dr["Num_Tel"].ToString()),
-                    assurance = Convert.ToBoolean(dr["Assurance"].ToString())
+                    assurance = Convert.ToBoolean(dr["Assurance"].ToString()),
+                    apikey = dr["APIKey"].ToString()
                 };
                 liste.Add(patient);
             }
@@ -93,6 +95,7 @@ namespace ServicePatient.Models.DAOS
                 DbType = System.Data.DbType.String,
                 Value = id
             };
+            cmd.Parameters.Add(parameter);
             DbDataReader dr = cmd.ExecuteReader();
             if (dr.Read())
             {
@@ -102,12 +105,13 @@ namespace ServicePatient.Models.DAOS
                     numAssMaladie = dr["Num_AssMal"].ToString(),
                     nom = dr["Nom"].ToString(),
                     prenom = dr["Prenom"].ToString(),
-                    age = Int32.Parse(dr["Age"].ToString()),
+                    date_naissance = DateTime.Parse(dr["Date_Naissance"].ToString()),
                     sexe = dr["Sexe"].ToString(),
                     allergies = dr["Allergies"].ToString(),
                     adresse = dr["Adresse"].ToString(),
                     num_tel = Int32.Parse(dr["Num_Tel"].ToString()),
-                    assurance = Convert.ToBoolean(dr["Assurance"].ToString())
+                    assurance = Convert.ToBoolean(dr["Assurance"].ToString()),
+                    apikey = dr["APIKey"].ToString()
                 };
                 return patient;
             }
@@ -138,7 +142,7 @@ namespace ServicePatient.Models.DAOS
                     numAssMaladie = dr["Num_AssMal"].ToString(),
                     nom = dr["Nom"].ToString(),
                     prenom = dr["Prenom"].ToString(),
-                    age = Int32.Parse(dr["Age"].ToString()),
+                    date_naissance = DateTime.Parse(dr["Date_Naissance"].ToString()),
                     sexe = dr["Sexe"].ToString(),
                     allergies = dr["Allergies"].ToString(),
                     adresse = dr["Adresse"].ToString(),
@@ -146,6 +150,7 @@ namespace ServicePatient.Models.DAOS
                     assurance = Convert.ToBoolean(dr["Assurance"].ToString())
                 };
                 string idPatient = patientKEY.id.ToString() + ".Patient";
+                AddKeyDatabase(patientKEY, EncodeToBase64(idPatient));
                 return EncodeToBase64(idPatient);
             }
             cnx.Close();
@@ -157,8 +162,8 @@ namespace ServicePatient.Models.DAOS
             cnx.ConnectionString = cnxString;
             cnx.Open();
             DbCommand cmd = cnx.CreateCommand();
-            cmd.CommandText = "INSERT INTO patient(Num_AssMal,Nom,Prenom,Age,Sexe,Allergies,Adresse,Num_Tel,Assurance) " +
-                "Values(@numAssMal,@nom,@prenom,@age,@sexe,@allergies,@adresse,@numero,@assurance)";
+            cmd.CommandText = "INSERT INTO patient(Num_AssMal,Nom,Prenom,Date_Naissance,Sexe,Allergies,Adresse,Num_Tel,Assurance) " +
+                "Values(@numAssMal,@nom,@prenom,@date,@sexe,@allergies,@adresse,@numero,@assurance)";
             DbParameter param;
             param = new MySqlParameter
             {
@@ -183,9 +188,9 @@ namespace ServicePatient.Models.DAOS
             cmd.Parameters.Add(param);
             param = new MySqlParameter
             {
-                ParameterName = "age",
-                DbType = System.Data.DbType.Int32,
-                Value = patient.age
+                ParameterName = "date",
+                DbType = System.Data.DbType.Date,
+                Value = patient.date_naissance
             };
             cmd.Parameters.Add(param);
             param = new MySqlParameter
@@ -237,7 +242,7 @@ namespace ServicePatient.Models.DAOS
             cnx.ConnectionString = cnxString;
             cnx.Open();
             DbCommand cmd = cnx.CreateCommand();
-            cmd.CommandText = "UPDATE patient SET Nom=@nom,Prenom=@prenom,Age=@age,Sexe=@sexe," +
+            cmd.CommandText = "UPDATE patient SET Nom=@nom,Prenom=@prenom,Date_Naissance=@date,Sexe=@sexe," +
                 "Allergies=@allergies,Adresse=@adresse,Num_Tel=@numero,Assurance=@assurance WHERE Num_AssMal=@numAssMal";
             DbParameter param;
             param = new MySqlParameter
@@ -263,9 +268,9 @@ namespace ServicePatient.Models.DAOS
             cmd.Parameters.Add(param);
             param = new MySqlParameter
             {
-                ParameterName = "age",
+                ParameterName = "date",
                 DbType = System.Data.DbType.Int32,
-                Value = patient.age
+                Value = patient.date_naissance
             };
             cmd.Parameters.Add(param);
             param = new MySqlParameter
@@ -308,6 +313,32 @@ namespace ServicePatient.Models.DAOS
             return result;
         }
 
+        private static bool AddKeyDatabase(Patient patient, string apikey)
+        {
+            DbConnection cnx = new MySqlConnection();
+            cnx.ConnectionString = cnxString;
+            cnx.Open();
+            DbCommand cmd = cnx.CreateCommand();
+            cmd.CommandText = "UPDATE patient Set APIKey=@apikey Where ID=@id";
+            DbParameter param;
+            param = new MySqlParameter
+            {
+                ParameterName = "id",
+                DbType = System.Data.DbType.Int32,
+                Value = patient.id
+            };
+            cmd.Parameters.Add(param);
+            param = new MySqlParameter
+            {
+                ParameterName = "apikey",
+                DbType = System.Data.DbType.String,
+                Value = apikey
+            };
+            cmd.Parameters.Add(param);
+            bool result = cmd.ExecuteNonQuery() > 0;
+            cnx.Close();
+            return result;
+        }
         private static string EncodeToBase64(string id)
         {
             var TextBytes = System.Text.Encoding.UTF8.GetBytes(id);

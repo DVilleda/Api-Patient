@@ -18,7 +18,7 @@ namespace ServicePatient.Models
         [DataMember]
         public string prenom { get; set; }
         [DataMember]
-        public int age { get; set; }
+        public DateTime date_naissance { get; set; }
         [DataMember]
         public string sexe { get; set; }
         [DataMember]
@@ -29,5 +29,7 @@ namespace ServicePatient.Models
         public int num_tel { get; set; }
         [DataMember]
         public bool assurance { get; set; }
+        [DataMember]
+        public string apikey { get; set; }
     }
 }

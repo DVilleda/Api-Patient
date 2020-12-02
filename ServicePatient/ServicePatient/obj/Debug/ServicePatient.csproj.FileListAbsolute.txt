@@ -96,3 +96,6 @@ C:\Users\Danny\Documents\Au2020\Service Echanges Donnees\ProjetFinal\apipatient\
 C:\Users\Danny\Documents\Au2020\Service Echanges Donnees\ProjetFinal\apipatient\ServicePatient\ServicePatient\obj\Debug\ServicePatient.csproj.CopyComplete
 C:\Users\Danny\Documents\Au2020\Service Echanges Donnees\ProjetFinal\apipatient\ServicePatient\ServicePatient\obj\Debug\ServicePatient.dll
 C:\Users\Danny\Documents\Au2020\Service Echanges Donnees\ProjetFinal\apipatient\ServicePatient\ServicePatient\obj\Debug\ServicePatient.pdb
+C:\Users\Danny\Documents\Au2020\Service Echanges Donnees\ProjetFinal\apipatient\ServicePatient\ServicePatient\bin\System.Web.Cors.dll
+C:\Users\Danny\Documents\Au2020\Service Echanges Donnees\ProjetFinal\apipatient\ServicePatient\ServicePatient\bin\System.Web.Http.Cors.dll
+C:\Users\Danny\Documents\Au2020\Service Echanges Donnees\ProjetFinal\apipatient\ServicePatient\ServicePatient\bin\System.Web.Http.Cors.xml

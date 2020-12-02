@@ -6,9 +6,11 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using System.Web.Http.Cors;
 
 namespace ServicePatient.Controllers
 {
+    [EnableCors(origins: "*", headers: "*", methods: "*")]
     public class PatientController : ApiController
     {
         // GET api/<controller>
@@ -17,30 +19,32 @@ namespace ServicePatient.Controllers
             return PatientProvider.GetAll();
         }
 
-        [Route("api/Patient/{patientID}/prescriptions")]
+        [Route("api/Patient/{patientID}/prescriptions/{token}")]
         [HttpGet]
-        public IEnumerable<Prescription> GetPrescriptions(int patientID)
+        public IEnumerable<Prescription> GetPrescriptions(int patientID, string token)
         {
+            if (token != PatientProvider.GetPatient(patientID).apikey) 
+            {
+                return null;
+            }
             return PrescriptionProvider.GetAllPrescriptionsByPatient(patientID);
         }
 
-        [Route("api/Patient/{patientID}/references")]
+        [Route("api/Patient/{patientID}/references/{token}")]
         [HttpGet]
-        public IEnumerable<References> GetReferences(int patientID)
+        public IEnumerable<References> GetReferences(int patientID,string token)
         {
+            if (token != PatientProvider.GetPatient(patientID).apikey)
+            {
+                return null;
+            }
             return ReferenceProvider.GetAllReferencesByPatient(patientID);
         }
 
-        [Route("api/Patient/{patientID}/Notes")]
-        [HttpGet]
-        public IEnumerable<Notes> GetNotes(int patientID)
-        {
-            return NotesProvider.GetNotesByPatient(patientID);
-        }
-
         // GET api/<controller>/5
-        public IHttpActionResult Get(int id)
+        public IHttpActionResult Get(int id,string token)
         {
+            if (token != PatientProvider.GetPatient(id).apikey) { return Unauthorized(); }
             Patient patient = PatientProvider.GetPatient(id);
             if (patient != null)
             {
@@ -59,8 +63,9 @@ namespace ServicePatient.Controllers
         }
 
         // PUT api/<controller>/5
-        public bool Put(Patient patient)
+        public bool Put(Patient patient,string token)
         {
+            if (token != PatientProvider.GetPatient(patient.id).apikey) { return false; }
             return PatientProvider.ModifierPatient(patient);
         }
 
