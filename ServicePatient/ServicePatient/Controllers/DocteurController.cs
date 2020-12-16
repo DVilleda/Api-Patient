@@ -35,7 +35,7 @@ namespace ServicePatient.Controllers
             }
         }
 
-        [Route("api/Docteur/{docteurID}/prescriptions")]
+        [Route("api/Docteur/prescriptions")]
         [HttpGet]
         public IEnumerable<Prescription> GetPrescriptions(string token)
         {
@@ -44,7 +44,7 @@ namespace ServicePatient.Controllers
             return PrescriptionProvider.GetAllPrescriptionsByDoctor(id);
         }
 
-        [Route("api/Docteur/{docteurID}/references")]
+        [Route("api/Docteur/references")]
         [HttpGet]
         public IEnumerable<References> GetReferences(string token)
         {
@@ -53,7 +53,7 @@ namespace ServicePatient.Controllers
             return ReferenceProvider.GetAllReferencesByDocteur(id);
         }
 
-        [Route("api/Docteur/{docteurID}/Notes")]
+        [Route("api/Docteur/Notes")]
         [HttpGet]
         public IEnumerable<Notes> GetNotes(string token)
         {
