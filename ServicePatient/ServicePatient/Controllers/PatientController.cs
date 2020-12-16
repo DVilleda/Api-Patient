@@ -19,15 +19,16 @@ namespace ServicePatient.Controllers
             return PatientProvider.GetAll();
         }
 
-        [Route("api/Patient/{patientID}/prescriptions/{token}")]
+        [Route("api/Patient/prescriptions")]
         [HttpGet]
-        public IEnumerable<Prescription> GetPrescriptions(int patientID, string token)
+        public IEnumerable<Prescription> GetPrescriptions(string token)
         {
-            if (token != PatientProvider.GetPatient(patientID).apikey) 
+            int id = new JWTAuthentication().DécoderTokenPourId(token);
+            if (token != PatientProvider.GetPatient(id).apikey) 
             {
                 return null;
             }
-            return PrescriptionProvider.GetAllPrescriptionsByPatient(patientID);
+            return PrescriptionProvider.GetAllPrescriptionsByPatient(id);
         }
 
         [Route("api/Patient/{patientID}/references/{token}")]

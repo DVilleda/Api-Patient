@@ -2,6 +2,7 @@
 using ServicePatient.Models.DAOS;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -19,10 +20,12 @@ namespace ServicePatient.Controllers
             return DocteurProvider.GetAllDocteur();
         }
 
-        // GET api/<controller>/actuel
+        // GET api/<controller>
         public IHttpActionResult Get(string token)
         {
+            Debug.WriteLine("passe");
             int id = new JWTAuthentication().DécoderTokenPourId(token);
+            Debug.WriteLine(id);
             if (new JWTAuthentication().DécoderTypeUtilisateur(token) != "Docteur") { return Unauthorized(); }
             Docteur docteur = DocteurProvider.getDocteur(id);
             if (docteur != null)
@@ -40,7 +43,7 @@ namespace ServicePatient.Controllers
         public IEnumerable<Prescription> GetPrescriptions(string token)
         {
             int id = new JWTAuthentication().DécoderTokenPourId(token);
-            if (token != DocteurProvider.getDocteur(id).apikey) { return null; }
+            if (new JWTAuthentication().DécoderTypeUtilisateur(token) == "Docteur") { return null; }
             return PrescriptionProvider.GetAllPrescriptionsByDoctor(id);
         }
 
@@ -49,7 +52,7 @@ namespace ServicePatient.Controllers
         public IEnumerable<References> GetReferences(string token)
         {
             int id = new JWTAuthentication().DécoderTokenPourId(token);
-            if (token != DocteurProvider.getDocteur(id).apikey) { return null; }
+            if (new JWTAuthentication().DécoderTypeUtilisateur(token) == "Docteur") { return null; }
             return ReferenceProvider.GetAllReferencesByDocteur(id);
         }
 
@@ -58,7 +61,7 @@ namespace ServicePatient.Controllers
         public IEnumerable<Notes> GetNotes(string token)
         {
             int id = new JWTAuthentication().DécoderTokenPourId(token);
-            if (token != DocteurProvider.getDocteur(id).apikey) { return null; }
+            if (new JWTAuthentication().DécoderTypeUtilisateur(token) == "Docteur") { return null; }
             return NotesProvider.GetNotesByDocteur(id);
         }
 
@@ -71,7 +74,8 @@ namespace ServicePatient.Controllers
         // PUT api/<controller>/5
         public bool Put(Docteur docteur,string token)
         {
-            if (token != DocteurProvider.getDocteur(docteur.id).apikey) { return false; }
+            int id = new JWTAuthentication().DécoderTokenPourId(token);
+            if (new JWTAuthentication().DécoderTypeUtilisateur(token) == "Docteur") { return false; }
             return DocteurProvider.ModifierDocteur(docteur);
         }
 
@@ -85,7 +89,8 @@ namespace ServicePatient.Controllers
         [HttpPost]
         public bool Post(Notes note,string token)
         {
-            if (token != DocteurProvider.getDocteur(note.id_docteur).apikey) { return false; }
+            int id = new JWTAuthentication().DécoderTokenPourId(token);
+            if (new JWTAuthentication().DécoderTypeUtilisateur(token) == "Docteur") { return false; }
             return NotesProvider.AddNote(note);
         }
 
@@ -93,7 +98,8 @@ namespace ServicePatient.Controllers
         [HttpPost]
         public bool Post(References references, string token)
         {
-            if (token != DocteurProvider.getDocteur(references.id_docteur).apikey) { return false; }
+            int id = new JWTAuthentication().DécoderTokenPourId(token);
+            if (new JWTAuthentication().DécoderTypeUtilisateur(token) == "Docteur") { return false; }
             return ReferenceProvider.AddReference(references);
         }
 
@@ -101,7 +107,8 @@ namespace ServicePatient.Controllers
         [HttpPost]
         public bool Post(Prescription prescription,string token)
         {
-            if (token != DocteurProvider.getDocteur(prescription.id_docteur).apikey) { return false; }
+            int id = new JWTAuthentication().DécoderTokenPourId(token);
+            if (new JWTAuthentication().DécoderTypeUtilisateur(token) == "Docteur") { return false; }
             return PrescriptionProvider.AddPrescription(prescription);
         }
 
@@ -110,7 +117,8 @@ namespace ServicePatient.Controllers
         public bool Delete(int idRef,string token) 
         {
             int IDdoc = ReferenceProvider.GetReference(idRef).id_docteur;
-            if (token != DocteurProvider.getDocteur(IDdoc).apikey) { return false; }
+            int id = new JWTAuthentication().DécoderTokenPourId(token);
+            if (new JWTAuthentication().DécoderTypeUtilisateur(token) == "Docteur") { return false; }
             return ReferenceProvider.DeleteReference(idRef);
         }
     }
