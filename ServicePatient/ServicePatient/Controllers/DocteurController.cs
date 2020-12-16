@@ -19,7 +19,7 @@ namespace ServicePatient.Controllers
             return DocteurProvider.GetAllDocteur();
         }
 
-        // GET api/<controller>/5
+        // GET api/<controller>/actuel
         public IHttpActionResult Get(string token)
         {
             int id = new JWTAuthentication().DécoderTokenPourId(token);
