@@ -61,7 +61,6 @@ namespace ServicePatient.Models.DAOS
                     prenom = dr["Prenom"].ToString(),
                     num_employe = Int32.Parse(dr["Num_Employe"].ToString()),
                     specialite = dr["Specialisation"].ToString(),
-                    apikey = dr["APIKey"].ToString()
                 };
                 return docteur;
             }
@@ -93,9 +92,8 @@ namespace ServicePatient.Models.DAOS
                     num_employe = Int32.Parse(dr["Num_Employe"].ToString()),
                     specialite = dr["Specialisation"].ToString()
                 };
-                string idDoc = docteurKEY.id.ToString()+".Docteur";
-                AddKeyDatabase(docteurKEY, EncodeToBase64(idDoc));
-                return EncodeToBase64(idDoc);
+                int idDoc = docteurKEY.id;
+                return new JWTAuthentication().GenererToken(idDoc, "Docteur");
             }
             cnx.Close();
             return null;

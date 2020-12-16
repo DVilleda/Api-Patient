@@ -20,9 +20,10 @@ namespace ServicePatient.Controllers
         }
 
         // GET api/<controller>/5
-        public IHttpActionResult Get(int id, string token)
+        public IHttpActionResult Get(string token)
         {
-            if (token != DocteurProvider.getDocteur(id).apikey) { return Unauthorized(); }
+            int id = new JWTAuthentication().DécoderTokenPourId(token);
+            if (new JWTAuthentication().DécoderTypeUtilisateur(token) != "Docteur") { return Unauthorized(); }
             Docteur docteur = DocteurProvider.getDocteur(id);
             if (docteur != null)
             {
@@ -36,26 +37,29 @@ namespace ServicePatient.Controllers
 
         [Route("api/Docteur/{docteurID}/prescriptions")]
         [HttpGet]
-        public IEnumerable<Prescription> GetPrescriptions(int docteurID,string token)
+        public IEnumerable<Prescription> GetPrescriptions(string token)
         {
-            if (token != DocteurProvider.getDocteur(docteurID).apikey) { return null; }
-            return PrescriptionProvider.GetAllPrescriptionsByDoctor(docteurID);
+            int id = new JWTAuthentication().DécoderTokenPourId(token);
+            if (token != DocteurProvider.getDocteur(id).apikey) { return null; }
+            return PrescriptionProvider.GetAllPrescriptionsByDoctor(id);
         }
 
         [Route("api/Docteur/{docteurID}/references")]
         [HttpGet]
-        public IEnumerable<References> GetReferences(int docteurID,string token)
+        public IEnumerable<References> GetReferences(string token)
         {
-            if (token != DocteurProvider.getDocteur(docteurID).apikey) { return null; }
-            return ReferenceProvider.GetAllReferencesByDocteur(docteurID);
+            int id = new JWTAuthentication().DécoderTokenPourId(token);
+            if (token != DocteurProvider.getDocteur(id).apikey) { return null; }
+            return ReferenceProvider.GetAllReferencesByDocteur(id);
         }
 
         [Route("api/Docteur/{docteurID}/Notes")]
         [HttpGet]
-        public IEnumerable<Notes> GetNotes(int docteurID,string token)
+        public IEnumerable<Notes> GetNotes(string token)
         {
-            if (token != DocteurProvider.getDocteur(docteurID).apikey) { return null; }
-            return NotesProvider.GetNotesByDocteur(docteurID);
+            int id = new JWTAuthentication().DécoderTokenPourId(token);
+            if (token != DocteurProvider.getDocteur(id).apikey) { return null; }
+            return NotesProvider.GetNotesByDocteur(id);
         }
 
         // POST api/<controller>
