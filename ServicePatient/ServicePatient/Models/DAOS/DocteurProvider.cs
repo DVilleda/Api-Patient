@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Diagnostics;
 using System.Linq;
 using System.Web;
 
@@ -172,6 +173,43 @@ namespace ServicePatient.Models.DAOS
             return result;
         }
 
+        public static List<Patient> ObtenirPatient(int id) 
+        {
+            List<Patient> liste = new List<Patient>();
+            List<int> listeIndexPatient = new List<int>();
+            Patient docteur;
+            DbConnection cnx = new MySqlConnection();
+            cnx.ConnectionString = cnxString;
+            cnx.Open();
+            DbCommand cmd = cnx.CreateCommand();
+            cmd.CommandText = "Select id_patient FROM patient_docteur WHERE id_docteur=@id";
+            DbParameter param;
+            param = new MySqlParameter
+            {
+                ParameterName = "id",
+                DbType = System.Data.DbType.Int32,
+                Value = id
+            };
+            cmd.Parameters.Add(param);
+            DbDataReader dr = cmd.ExecuteReader();
+            while (dr.Read()) 
+            {
+                int IDPatient = Int32.Parse(dr["id_patient"].ToString());
+                listeIndexPatient.Add(IDPatient);
+            }
+
+            for (int i=0;i<listeIndexPatient.Count;i++) 
+            {
+                liste.Add(PatientProvider.GetPatient(listeIndexPatient[i]));
+            }
+            cnx.Close();
+            return liste;
+        }
+
+
+
+
+        #region oldMethod
         private static bool AddKeyDatabase(Docteur docteur,string apikey) 
         {
             DbConnection cnx = new MySqlConnection();
@@ -203,5 +241,6 @@ namespace ServicePatient.Models.DAOS
             var TextBytes = System.Text.Encoding.UTF8.GetBytes(id);
             return System.Convert.ToBase64String(TextBytes);
         }
+        #endregion
     }
 }

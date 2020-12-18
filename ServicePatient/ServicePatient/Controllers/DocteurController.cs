@@ -38,6 +38,14 @@ namespace ServicePatient.Controllers
             }
         }
 
+        [Route("api/Docteur/patients")]
+        public IEnumerable<Patient> GetPatientParDocteur(string token) 
+        {
+            int id = new JWTAuthentication().DécoderTokenPourId(token);
+            if (new JWTAuthentication().DécoderTypeUtilisateur(token) == "Docteur") { return null; }
+            return DocteurProvider.ObtenirPatient(id);
+        }
+
         [Route("api/Docteur/prescriptions")]
         [HttpGet]
         public IEnumerable<Prescription> GetPrescriptions(string token)

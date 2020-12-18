@@ -269,7 +269,7 @@ namespace ServicePatient.Models.DAOS
             param = new MySqlParameter
             {
                 ParameterName = "date",
-                DbType = System.Data.DbType.Int32,
+                DbType = System.Data.DbType.Date,
                 Value = patient.date_naissance
             };
             cmd.Parameters.Add(param);
