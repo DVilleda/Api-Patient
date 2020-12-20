@@ -29,7 +29,5 @@ namespace ServicePatient.Models
         public int num_tel { get; set; }
         [DataMember]
         public bool assurance { get; set; }
-        [DataMember]
-        public string apikey { get; set; }
     }
 }

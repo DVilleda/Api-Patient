@@ -19,7 +19,5 @@ namespace ServicePatient.Models
         public int num_employe { get; set; }
         [DataMember]
         public string specialite { get; set; }
-        [DataMember]
-        public string apikey { get; set; }
     }
 }

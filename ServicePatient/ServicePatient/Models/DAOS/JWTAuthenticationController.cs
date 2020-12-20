@@ -1,6 +1,7 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
@@ -12,11 +13,10 @@ namespace ServicePatient.Models.DAOS
 {
     public class JWTAuthentication
     {
-        private static string SecretKey = "TW9zaGVFcmV6UHKiolF0sopeFQ==";
+        private static string SecretKey = "XCAP05H6LoKvbRRa/QkqLNMI7cOHguaRyHzyg7n5qEkGjQmtBhz4SzYh4Fqwjyi3KJHlSXKPwVu2+bXr6CtpgQ==";
 
         public string GenererToken(int id, string typeUtilisateur)
         {
-            string laCle = "";
             byte[] key = Convert.FromBase64String(SecretKey);
             SymmetricSecurityKey securityKey = new SymmetricSecurityKey(key);
             SecurityTokenDescriptor descriptor = new SecurityTokenDescriptor
@@ -25,7 +25,6 @@ namespace ServicePatient.Models.DAOS
                     new Claim(ClaimTypes.NameIdentifier, id.ToString()),
                     new Claim(ClaimTypes.Actor, typeUtilisateur)
                 }),
-                Expires = DateTime.UtcNow.AddMinutes(30),
                 SigningCredentials = new SigningCredentials(securityKey,
                   SecurityAlgorithms.HmacSha256Signature)
             };
@@ -37,27 +36,33 @@ namespace ServicePatient.Models.DAOS
 
         public static ClaimsPrincipal GetPrincipal(string token)
         {
+            Debug.WriteLine("clé: " + token);
+           
             try
             {
-                JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
-                JwtSecurityToken jwtToken = (JwtSecurityToken)tokenHandler.ReadToken(token);
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var jwtToken = tokenHandler.ReadToken(token) as JwtSecurityToken;
+
                 if (jwtToken == null)
                     return null;
-                byte[] key = Convert.FromBase64String(SecretKey);
-                TokenValidationParameters parameters = new TokenValidationParameters()
+
+                var symmetricKey = Convert.FromBase64String(SecretKey);
+                var validationParameters = new TokenValidationParameters()
                 {
-                    RequireExpirationTime = true,
                     ValidateIssuer = false,
                     ValidateAudience = false,
-                    IssuerSigningKey = new SymmetricSecurityKey(key)
+                    IssuerSigningKey = new SymmetricSecurityKey(symmetricKey)
                 };
+
                 SecurityToken securityToken;
-                ClaimsPrincipal principal = tokenHandler.ValidateToken(token,
-                      parameters, out securityToken);
+                var principal = tokenHandler.ValidateToken(token, validationParameters, out securityToken);
+
                 return principal;
             }
             catch (Exception e)
             {
+                Debug.WriteLine(e);
+                Debug.WriteLine("FAIL PRINCIPAL");
                 return null;
             }
         }
@@ -65,9 +70,13 @@ namespace ServicePatient.Models.DAOS
         public int DécoderTokenPourId(string token)
         {
             int id = -1;
+            byte[] key = Convert.FromBase64String(SecretKey);
             ClaimsPrincipal principal = GetPrincipal(token);
+
             if (principal == null)
+            {
                 return -1;
+            }
             ClaimsIdentity identity = null;
             try
             {
@@ -86,6 +95,7 @@ namespace ServicePatient.Models.DAOS
         public string DécoderTypeUtilisateur(string token)
         {
             string type = null;
+            byte[] key = Convert.FromBase64String(SecretKey);
             ClaimsPrincipal principal = GetPrincipal(token);
             if (principal == null)
                 return null;
