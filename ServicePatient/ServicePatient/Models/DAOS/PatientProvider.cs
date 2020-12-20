@@ -10,7 +10,7 @@ namespace ServicePatient.Models.DAOS
     public class PatientProvider
     {
         public static string cnxString = "Server=127.0.0.1;Uid=root;Pwd=root;Database=clinique";
-
+        //Obtenir tout les patients
         public static List<Patient> GetAll() 
         {
             List<Patient> liste = new List<Patient>();
@@ -34,16 +34,15 @@ namespace ServicePatient.Models.DAOS
                     allergies = dr["Allergies"].ToString(),
                     adresse = dr["Adresse"].ToString(),
                     num_tel = Int32.Parse(dr["Num_Tel"].ToString()),
-                    assurance = Convert.ToBoolean(dr["Assurance"].ToString()),
-                    apikey = dr["APIKey"].ToString()
+                    assurance = Convert.ToBoolean(dr["Assurance"].ToString())
                 };
                 liste.Add(patient);
             }
             cnx.Close();
             return liste;
         }
-
-        public static List<Patient> GetPatientByNom(string nom_famille) 
+        //Obtenir un patient selon le nom
+        public static List<Patient> GetPatientByNom(string nom_famille,string prenom) 
         {
             List<Patient> liste = new List<Patient>();
             Patient patient;
@@ -51,13 +50,22 @@ namespace ServicePatient.Models.DAOS
             cnx.ConnectionString = cnxString;
             cnx.Open();
             DbCommand cmd = cnx.CreateCommand();
-            cmd.CommandText = "Select * from patient WHERE Nom=@nom_famille";
-            DbParameter parameter = new MySqlParameter
+            cmd.CommandText = "Select * from patient WHERE Nom=@nom_famille AND Prenom=@prenom";
+            DbParameter parameter; 
+            parameter = new MySqlParameter
             {
                 ParameterName = "nom_famille",
                 DbType = System.Data.DbType.String,
                 Value = nom_famille
             };
+            cmd.Parameters.Add(parameter);
+            parameter = new MySqlParameter
+            {
+                ParameterName = "prenom",
+                DbType = System.Data.DbType.String,
+                Value = prenom
+            };
+            cmd.Parameters.Add(parameter);
             DbDataReader dr = cmd.ExecuteReader();
             while (dr.Read())
             {
@@ -72,15 +80,52 @@ namespace ServicePatient.Models.DAOS
                     allergies = dr["Allergies"].ToString(),
                     adresse = dr["Adresse"].ToString(),
                     num_tel = Int32.Parse(dr["Num_Tel"].ToString()),
-                    assurance = Convert.ToBoolean(dr["Assurance"].ToString()),
-                    apikey = dr["APIKey"].ToString()
+                    assurance = Convert.ToBoolean(dr["Assurance"].ToString())
                 };
                 liste.Add(patient);
             }
             cnx.Close();
             return liste;
         }
-
+        //Obtenir un patient selon le numéro assurance maladie
+        public static List<Patient> GetPatientByNumAssMal(string NumAss)
+        {
+            List<Patient> liste = new List<Patient>();
+            Patient patient;
+            DbConnection cnx = new MySqlConnection();
+            cnx.ConnectionString = cnxString;
+            cnx.Open();
+            DbCommand cmd = cnx.CreateCommand();
+            cmd.CommandText = "Select * from patient WHERE Num_AssMal=@num_assMal";
+            DbParameter parameter = new MySqlParameter
+            {
+                ParameterName = "num_assMal",
+                DbType = System.Data.DbType.String,
+                Value = NumAss
+            };
+            cmd.Parameters.Add(parameter);
+            DbDataReader dr = cmd.ExecuteReader();
+            while (dr.Read())
+            {
+                patient = new Patient
+                {
+                    id = Int32.Parse(dr["ID"].ToString()),
+                    numAssMaladie = dr["Num_AssMal"].ToString(),
+                    nom = dr["Nom"].ToString(),
+                    prenom = dr["Prenom"].ToString(),
+                    date_naissance = DateTime.Parse(dr["Date_Naissance"].ToString()),
+                    sexe = dr["Sexe"].ToString(),
+                    allergies = dr["Allergies"].ToString(),
+                    adresse = dr["Adresse"].ToString(),
+                    num_tel = Int32.Parse(dr["Num_Tel"].ToString()),
+                    assurance = Convert.ToBoolean(dr["Assurance"].ToString())
+                };
+                liste.Add(patient);
+            }
+            cnx.Close();
+            return liste;
+        }
+        //Obtenir un Patient par ID
         public static Patient GetPatient(int id)
         {
             Patient patient;
@@ -110,14 +155,14 @@ namespace ServicePatient.Models.DAOS
                     allergies = dr["Allergies"].ToString(),
                     adresse = dr["Adresse"].ToString(),
                     num_tel = Int32.Parse(dr["Num_Tel"].ToString()),
-                    assurance = Convert.ToBoolean(dr["Assurance"].ToString()),
-                    apikey = dr["APIKey"].ToString()
+                    assurance = Convert.ToBoolean(dr["Assurance"].ToString())
                 };
                 return patient;
             }
             cnx.Close();
             return null;
         }
+        //Méthode en charge de créer une clé API selon un patient créé
         public static string RetournerAPIKey(Patient patient)
         {
             Patient patientKEY;
@@ -149,13 +194,13 @@ namespace ServicePatient.Models.DAOS
                     num_tel = Int32.Parse(dr["Num_Tel"].ToString()),
                     assurance = Convert.ToBoolean(dr["Assurance"].ToString())
                 };
-                string idPatient = patientKEY.id.ToString() + ".Patient";
-                AddKeyDatabase(patientKEY, EncodeToBase64(idPatient));
-                return EncodeToBase64(idPatient);
+                int idPatient = patientKEY.id;
+                return new JWTAuthentication().GenererToken(idPatient, "Patient");
             }
             cnx.Close();
             return null;
         }
+        //Ajouter un Patient
         public static string AddPatient(Patient patient) 
         {
             DbConnection cnx = new MySqlConnection();
@@ -236,6 +281,7 @@ namespace ServicePatient.Models.DAOS
             }
             else { return null; }
         }
+        //Modifier un Patient
         public static bool ModifierPatient(Patient patient)
         {
             DbConnection cnx = new MySqlConnection();
@@ -312,37 +358,56 @@ namespace ServicePatient.Models.DAOS
             cnx.Close();
             return result;
         }
-
-        private static bool AddKeyDatabase(Patient patient, string apikey)
+        public static bool DeletePatient(int id) 
         {
             DbConnection cnx = new MySqlConnection();
             cnx.ConnectionString = cnxString;
             cnx.Open();
             DbCommand cmd = cnx.CreateCommand();
-            cmd.CommandText = "UPDATE patient Set APIKey=@apikey Where ID=@id";
+            cmd.CommandText = "DELETE from patient WHERE ID=@id";
             DbParameter param;
             param = new MySqlParameter
             {
                 ParameterName = "id",
                 DbType = System.Data.DbType.Int32,
-                Value = patient.id
-            };
-            cmd.Parameters.Add(param);
-            param = new MySqlParameter
-            {
-                ParameterName = "apikey",
-                DbType = System.Data.DbType.String,
-                Value = apikey
+                Value = id
             };
             cmd.Parameters.Add(param);
             bool result = cmd.ExecuteNonQuery() > 0;
             cnx.Close();
             return result;
         }
-        private static string EncodeToBase64(string id)
+        //Obtenir nos Docteurs
+        public static List<Docteur> ObtenirDocteurs(int id) 
         {
-            var TextBytes = System.Text.Encoding.UTF8.GetBytes(id);
-            return System.Convert.ToBase64String(TextBytes);
+            List<Docteur> liste = new List<Docteur>();
+            List<int> listeIndexDocteur = new List<int>();
+            DbConnection cnx = new MySqlConnection();
+            cnx.ConnectionString = cnxString;
+            cnx.Open();
+            DbCommand cmd = cnx.CreateCommand();
+            cmd.CommandText = "Select id_docteur FROM patient_docteur WHERE id_patient=@id";
+            DbParameter param;
+            param = new MySqlParameter
+            {
+                ParameterName = "id",
+                DbType = System.Data.DbType.Int32,
+                Value = id
+            };
+            cmd.Parameters.Add(param);
+            DbDataReader dr = cmd.ExecuteReader();
+            while (dr.Read())
+            {
+                int IDPatient = Int32.Parse(dr["id_docteur"].ToString());
+                listeIndexDocteur.Add(IDPatient);
+            }
+
+            for (int i = 0; i < listeIndexDocteur.Count; i++)
+            {
+                liste.Add(DocteurProvider.GetDocteurSecured(listeIndexDocteur[i]));
+            }
+            cnx.Close();
+            return liste;
         }
     }
 }

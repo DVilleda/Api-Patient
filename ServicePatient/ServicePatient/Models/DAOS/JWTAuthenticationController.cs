@@ -34,33 +34,35 @@ namespace ServicePatient.Models.DAOS
             return handler.WriteToken(token);
         }
 
-        public static ClaimsPrincipal GetPrincipal(byte[] key, string token)
+        public static ClaimsPrincipal GetPrincipal(string token)
         {
             Debug.WriteLine("clé: " + token);
            
             try
             {
-                JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
-                JwtSecurityToken jwtToken = (JwtSecurityToken)tokenHandler.ReadToken(token);
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var jwtToken = tokenHandler.ReadToken(token) as JwtSecurityToken;
+
                 if (jwtToken == null)
-                {
                     return null;
-                }
-                
-                Debug.WriteLine("passe ici");
-                TokenValidationParameters parameters = new TokenValidationParameters()
+
+                var symmetricKey = Convert.FromBase64String(SecretKey);
+                var validationParameters = new TokenValidationParameters()
                 {
-                    RequireExpirationTime = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(key)
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    IssuerSigningKey = new SymmetricSecurityKey(symmetricKey)
                 };
+
                 SecurityToken securityToken;
-                ClaimsPrincipal principal = tokenHandler.ValidateToken(token,
-                      parameters, out securityToken);
+                var principal = tokenHandler.ValidateToken(token, validationParameters, out securityToken);
+
                 return principal;
             }
             catch (Exception e)
             {
                 Debug.WriteLine(e);
+                Debug.WriteLine("FAIL PRINCIPAL");
                 return null;
             }
         }
@@ -69,7 +71,7 @@ namespace ServicePatient.Models.DAOS
         {
             int id = -1;
             byte[] key = Convert.FromBase64String(SecretKey);
-            ClaimsPrincipal principal = GetPrincipal(key, token);
+            ClaimsPrincipal principal = GetPrincipal(token);
 
             if (principal == null)
             {
@@ -94,7 +96,7 @@ namespace ServicePatient.Models.DAOS
         {
             string type = null;
             byte[] key = Convert.FromBase64String(SecretKey);
-            ClaimsPrincipal principal = GetPrincipal(key, token);
+            ClaimsPrincipal principal = GetPrincipal(token);
             if (principal == null)
                 return null;
             ClaimsIdentity identity = null;

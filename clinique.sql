@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Dec 02, 2020 at 02:31 AM
+-- Generation Time: Dec 20, 2020 at 02:13 AM
 -- Server version: 5.7.11
 -- PHP Version: 5.6.18
 
@@ -31,17 +31,19 @@ CREATE TABLE `docteur` (
   `Nom` varchar(255) NOT NULL,
   `Prenom` varchar(255) NOT NULL,
   `Num_Employe` int(11) NOT NULL,
-  `Specialisation` varchar(255) DEFAULT 'Pratique Générale',
-  `APIKey` varchar(255) DEFAULT NULL
+  `Specialisation` varchar(255) DEFAULT 'Pratique Générale'
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `docteur`
 --
 
-INSERT INTO `docteur` (`ID`, `Nom`, `Prenom`, `Num_Employe`, `Specialisation`, `APIKey`) VALUES
-(1, 'McDonald', 'Ronald', 123456789, 'Alimentation', 'MS5Eb2N0ZXVy'),
-(2, 'Smith', 'Adam', 123712893, 'Pratique générale', 'Mi5Eb2N0ZXVy');
+INSERT INTO `docteur` (`ID`, `Nom`, `Prenom`, `Num_Employe`, `Specialisation`) VALUES
+(1, 'McDonald', 'Ronald', 123456789, 'Alimentation'),
+(2, 'Smith', 'Adam', 123712893, 'Pratique générale'),
+(3, 'Smith', 'Dan', 1234123, 'Rien'),
+(4, 'McMaster', 'Arthur', 5431231, 'Rien'),
+(6, 'Sanchez', 'Juan', 9995612, 'Cardiologie');
 
 -- --------------------------------------------------------
 
@@ -64,7 +66,9 @@ CREATE TABLE `notes` (
 
 INSERT INTO `notes` (`ID`, `id_patient`, `id_docteur`, `Titre`, `Contenu`, `Date_Note`) VALUES
 (1, 1, 1, 'Résultat X-Ray', 'Pas de fracture dans le bras', '2020-12-01'),
-(2, 1, 2, 'Résultat Test Sang', 'Niveau de globule rouge est normal', '2020-12-05');
+(2, 1, 2, 'Résultat Test Sang', 'Niveau de globule rouge est normal', '2020-12-05'),
+(3, 1, 1, 'TEST', 'Test Post Note.', '2020-12-16'),
+(4, 3, 6, 'Test', 'TestTest', '2020-12-19');
 
 -- --------------------------------------------------------
 
@@ -82,18 +86,18 @@ CREATE TABLE `patient` (
   `Allergies` varchar(255) DEFAULT 'Aucune Mentionné',
   `Adresse` varchar(255) NOT NULL,
   `Num_Tel` int(15) NOT NULL,
-  `Assurance` tinyint(1) DEFAULT '0',
-  `APIKey` varchar(255) DEFAULT NULL
+  `Assurance` tinyint(1) DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `patient`
 --
 
-INSERT INTO `patient` (`ID`, `Num_AssMal`, `Nom`, `Prenom`, `Date_Naissance`, `Sexe`, `Allergies`, `Adresse`, `Num_Tel`, `Assurance`, `APIKey`) VALUES
-(1, 'asdasd123213123', 'McMaster', 'John', '1975-10-01', 'Homme', 'Aucune Mentionné', 'St Martins House, 2 Peacock Ln, Leicester LE1 5PZ, United Kingdom', 1162615200, 0, 'MS5QYXRpZW50'),
-(2, 'asdas2567567567', 'Sanchez', 'Sara', '1987-04-01', 'Femme', 'Arachides', '1624 Saint-Catherine St W, Montreal, Quebec H3H 2S7', 514569123, 1, 'Mi5QYXRpZW50'),
-(3, 'uiouiou65675674', 'Richard', 'Maurice', '2000-08-31', 'Homme', 'Aucune Mentionné', '1909 Avenue des Canadiens-de-Montréal, Montréal, QC H4B 5G0', 514999999, 1, 'My5QYXRpZW50');
+INSERT INTO `patient` (`ID`, `Num_AssMal`, `Nom`, `Prenom`, `Date_Naissance`, `Sexe`, `Allergies`, `Adresse`, `Num_Tel`, `Assurance`) VALUES
+(1, 'asdasd123213123', 'McMaster', 'John', '1975-10-01', 'Homme', 'Aucune Mentionné', 'St Martins House, 2 Peacock Ln, Leicester LE1 5PZ, United Kingdom', 1162615200, 0),
+(2, 'asdas2567567567', 'Sanchez', 'Sara', '1987-04-01', 'Femme', 'Arachides', '1624 Saint-Catherine St W, Montreal, Quebec H3H 2S7', 514569123, 1),
+(3, 'uiouiou65675674', 'Richard', 'Maurice', '1920-11-03', 'Homme', 'Aucune Mentionné', '1909 Avenue des Canadiens-de-Montréal, Montréal, QC H4B 5G0', 514123123, 0),
+(4, '123125345345', 'Phat', 'Kim', '2006-01-01', 'Préfère ne pas répondre', 'Aucune Mentionné', '123 Spring St, Springfield, PA, USA', 23423423, 0);
 
 -- --------------------------------------------------------
 
@@ -112,7 +116,9 @@ CREATE TABLE `patient_docteur` (
 --
 
 INSERT INTO `patient_docteur` (`ID`, `id_patient`, `id_docteur`) VALUES
-(1, 1, 2);
+(1, 1, 1),
+(2, 2, 2),
+(4, 2, 6);
 
 -- --------------------------------------------------------
 
@@ -160,7 +166,8 @@ CREATE TABLE `reference` (
 --
 
 INSERT INTO `reference` (`ID`, `id_patient`, `id_docteur`, `Nom_Specialisation`, `Lieu_Reference`, `Raison`, `Date_Reference`) VALUES
-(1, 2, 2, 'Cardiologie', 'Institut de cardiologie de Montréal', 'Test de résonnance magnétique au niveau des poumons et coeur.', '2020-09-10');
+(1, 2, 2, 'Cardiologie', 'Institut de cardiologie de Montréal', 'Test de résonnance magnétique au niveau des poumons et coeur.', '2020-09-10'),
+(2, 1, 1, 'asdas', 'dasda', 'asdas', '2020-12-09');
 
 --
 -- Indexes for dumped tables
@@ -220,22 +227,22 @@ ALTER TABLE `reference`
 -- AUTO_INCREMENT for table `docteur`
 --
 ALTER TABLE `docteur`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 --
 -- AUTO_INCREMENT for table `notes`
 --
 ALTER TABLE `notes`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 --
 -- AUTO_INCREMENT for table `patient`
 --
 ALTER TABLE `patient`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 --
 -- AUTO_INCREMENT for table `patient_docteur`
 --
 ALTER TABLE `patient_docteur`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 --
 -- AUTO_INCREMENT for table `prescriptions`
 --
@@ -245,7 +252,7 @@ ALTER TABLE `prescriptions`
 -- AUTO_INCREMENT for table `reference`
 --
 ALTER TABLE `reference`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 --
 -- Constraints for dumped tables
 --
@@ -261,8 +268,8 @@ ALTER TABLE `notes`
 -- Constraints for table `patient_docteur`
 --
 ALTER TABLE `patient_docteur`
-  ADD CONSTRAINT `JointureDOC_FK` FOREIGN KEY (`id_docteur`) REFERENCES `docteur` (`ID`),
-  ADD CONSTRAINT `JointurePatient_FK` FOREIGN KEY (`id_patient`) REFERENCES `patient` (`ID`);
+  ADD CONSTRAINT `JointureDOC_FK` FOREIGN KEY (`id_docteur`) REFERENCES `docteur` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `JointurePatient_FK` FOREIGN KEY (`id_patient`) REFERENCES `patient` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `prescriptions`
