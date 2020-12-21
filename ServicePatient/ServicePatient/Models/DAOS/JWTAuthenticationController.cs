@@ -51,6 +51,7 @@ namespace ServicePatient.Models.DAOS
                 {
                     ValidateIssuer = false,
                     ValidateAudience = false,
+                    ValidateLifetime =false,
                     IssuerSigningKey = new SymmetricSecurityKey(symmetricKey)
                 };
 
