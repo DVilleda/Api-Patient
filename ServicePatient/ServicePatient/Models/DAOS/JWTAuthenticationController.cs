@@ -1,4 +1,5 @@
 ﻿using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -13,8 +14,7 @@ namespace ServicePatient.Models.DAOS
 {
     public class JWTAuthentication
     {
-        private static string SecretKey = "XCAP05H6LoKvbRRa/QkqLNMI7cOHguaRyHzyg7n5qEkGjQmtBhz4SzYh4Fqwjyi3KJHlSXKPwVu2+bXr6CtpgQ==";
-
+        private static string SecretKey = "ERMN05OPLoDvbTTa/QkqLNMI7cPLguaRyHzyg7n5qNBVjQmtBhz4SzYh4NBVCXi3KJHlSXKP+oi2+bXr6CUYTR==";
         public string GenererToken(int id, string typeUtilisateur)
         {
             byte[] key = Convert.FromBase64String(SecretKey);
@@ -22,13 +22,12 @@ namespace ServicePatient.Models.DAOS
             SecurityTokenDescriptor descriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new[] {
-                    new Claim(ClaimTypes.NameIdentifier, id.ToString()),
-                    new Claim(ClaimTypes.Actor, typeUtilisateur)
+                    new Claim(ClaimTypes.Name, id.ToString()),
+                    new Claim(ClaimTypes.Role, typeUtilisateur)
                 }),
-                SigningCredentials = new SigningCredentials(securityKey,
-                  SecurityAlgorithms.HmacSha256Signature)
+                Expires = DateTime.UtcNow.AddMinutes(30),
+                SigningCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature)
             };
-
             JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
             JwtSecurityToken token = handler.CreateJwtSecurityToken(descriptor);
             return handler.WriteToken(token);
@@ -36,16 +35,13 @@ namespace ServicePatient.Models.DAOS
 
         public static ClaimsPrincipal GetPrincipal(string token)
         {
-            Debug.WriteLine("clé: " + token);
            
             try
             {
                 var tokenHandler = new JwtSecurityTokenHandler();
                 var jwtToken = tokenHandler.ReadToken(token) as JwtSecurityToken;
-
                 if (jwtToken == null)
                     return null;
-
                 var symmetricKey = Convert.FromBase64String(SecretKey);
                 var validationParameters = new TokenValidationParameters()
                 {
@@ -56,7 +52,7 @@ namespace ServicePatient.Models.DAOS
                 };
 
                 SecurityToken securityToken;
-                var principal = tokenHandler.ValidateToken(token, validationParameters, out securityToken);
+                var principal = tokenHandler.ValidateToken(token.ToString(), validationParameters, out securityToken);
 
                 return principal;
             }
@@ -88,7 +84,7 @@ namespace ServicePatient.Models.DAOS
                 return -1;
             }
 
-            Claim idClaim = identity.FindFirst(ClaimTypes.NameIdentifier);
+            Claim idClaim = identity.FindFirst(ClaimTypes.Name);
             id = Int32.Parse(idClaim.Value);
             return id;
         }
@@ -110,7 +106,7 @@ namespace ServicePatient.Models.DAOS
                 return null;
             }
 
-            Claim idClaim = identity.FindFirst(ClaimTypes.Actor);
+            Claim idClaim = identity.FindFirst(ClaimTypes.Role);
             type = idClaim.Value;
             return type;
         }

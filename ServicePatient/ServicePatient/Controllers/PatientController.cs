@@ -89,6 +89,7 @@ namespace ServicePatient.Controllers
         public IEnumerable<Prescription> GetPrescriptions(string token)
         {
             int id = new JWTAuthentication().DécoderTokenPourId(token);
+            Debug.WriteLine("Info id: " + id);
             if (new JWTAuthentication().DécoderTypeUtilisateur(token) != "Patient") { Unauthorized(); }
             return PrescriptionProvider.GetAllPrescriptionsByPatient(id);
         }

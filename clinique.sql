@@ -25,7 +25,8 @@ SET time_zone = "+00:00";
 --
 -- Table structure for table `docteur`
 --
-
+CREATE DATABASE IF NOT EXISTS `clinique`;
+USE `clinique`;
 CREATE TABLE `docteur` (
   `ID` int(11) NOT NULL,
   `Nom` varchar(255) NOT NULL,
