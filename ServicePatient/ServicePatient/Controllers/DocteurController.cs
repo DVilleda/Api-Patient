@@ -89,6 +89,14 @@ namespace ServicePatient.Controllers
             return PatientProvider.GetPatientByNumAssMal(numAssMal);
         }
 
+        [Route("api/Docteur/Patients/IDPatient")]
+        [HttpGet]
+        public Patient GetPatientParID(string token, int IDPatient)
+        {
+            if (new JWTAuthentication().DécoderTypeUtilisateur(token) != "Docteur") { return null; }
+            return PatientProvider.GetPatient(IDPatient);
+        }
+
         [Route("api/Docteur/PatientsDispo")]
         [HttpGet]
         public IEnumerable<Patient> GetPatientSansDocteur(string token)
