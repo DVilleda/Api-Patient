@@ -101,7 +101,7 @@ namespace ServicePatient.Controllers
         [HttpGet]
         public IEnumerable<Patient> GetPatientSansDocteur(string token)
         {
-            if (new JWTAuthentication().DécoderTypeUtilisateur(token) == "Docteur") { return null; }
+            if (new JWTAuthentication().DécoderTypeUtilisateur(token) != "Docteur") { return null; }
             return DocteurProvider.GetPatientsSansDocteur();
         }
 
