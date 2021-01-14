@@ -180,6 +180,14 @@ namespace ServicePatient.Controllers
             return PrescriptionProvider.AddPrescription(prescription);
         }
 
+        [Route("api/Docteur/ModifierPrescription")]
+        [HttpPut]
+        public bool Modifier(Prescription prescription, string token) 
+        {
+            if (new JWTAuthentication().DécoderTypeUtilisateur(token) != "Docteur") { return false; }
+            return PrescriptionProvider.UpdatePrescription(prescription);
+        }
+
         [Route("api/Docteur/DeleteReference")]
         [HttpDelete]
         public bool Delete(int idRef,string token) 
