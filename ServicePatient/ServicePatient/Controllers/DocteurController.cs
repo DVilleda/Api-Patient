@@ -129,7 +129,7 @@ namespace ServicePatient.Controllers
         {
             int id = new JWTAuthentication().DécoderTokenPourId(token);
             if (new JWTAuthentication().DécoderTypeUtilisateur(token) != "Docteur") { return false; }
-            return DocteurProvider.EnleverPatient(IDPatient,6);
+            return DocteurProvider.EnleverPatient(IDPatient,id);
         }
         #endregion
 
